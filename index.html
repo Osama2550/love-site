@@ -50,10 +50,10 @@ button{padding:15px 25px;font-size:1.1rem;border:none;border-radius:30px;cursor:
 </div>
 
 <audio id="pop">
-  <source src="https://cdn.pixabay.com/audio/2022/03/15/audio_58bfc4b2aa.mp3" type="audio/mpeg">
+  <source src="pop.mp3" type="audio/mpeg">
 </audio>
 <audio id="bgMusic" loop>
-  <source src="https://cdn.pixabay.com/audio/2023/02/23/audio_6f1385c2cd.mp3" type="audio/mpeg">
+  <source src="background.mp3" type="audio/mpeg">
 </audio>
 
 <script>
@@ -70,24 +70,34 @@ let end = document.getElementById("end");
 let bgMusic = document.getElementById("bgMusic");
 let startMusicBtn = document.getElementById("startMusic");
 
-// --- التعديل الذكي هنا ---
+// --- التعامل مع الاسم الذكي ---
 const urlParams = new URLSearchParams(window.location.search);
 let person = urlParams.get("name");
 
-// إذا لم يجد الاسم في الرابط، وفقط في هذه الحالة، يظهر المربع
 if (!person || person.trim() === "") {
-    person = prompt("Enter the person's name 💖");
-    if (!person || person.trim() === "") {
-        person = "Sweetheart"; 
-    }
+    person = prompt("Enter the person's name 💖") || "Sweetheart";
 }
 
 question.textContent = `Do you love me, ${person}? ❤️`;
 endMsg.textContent = `Will you be mine, ${person}? 💍❤️`;
-shareLink.href = `https://wa.me/?text=I%20said%20YES%20❤️%20Will%20you%20be%20mine%2C%20${encodeURIComponent(person)}%3F%20Check%20it%20out:%20${encodeURIComponent(window.location.href)}`;
+shareLink.href = `https://wa.me/?text=I%20said%20YES%20❤️%20to%20${encodeURIComponent(person)}!%20Check%20it%20out:%20${encodeURIComponent(window.location.href)}`;
 
-let count = parseInt(localStorage.getItem("noCount") || "0");
-countEl.textContent = count;
+// --- نظام تشغيل الموسيقى المطور ---
+function startAudio() {
+    bgMusic.play().then(() => {
+        startMusicBtn.style.display = "none";
+    }).catch(() => {
+        console.log("Waiting for user interaction to play audio");
+    });
+}
+
+// تشغيل عند أول لمسة للشاشة لضمان عملها على الموبايل
+document.body.addEventListener('click', startAudio, { once: true });
+document.body.addEventListener('touchstart', startAudio, { once: true });
+
+startMusicBtn.addEventListener("click", startAudio);
+
+let count = 0; // يفضل تصفير العداد عند كل دخول جديد لزيادة المتعة
 
 const messages = [
   "Why don't you love me? 😢",
@@ -100,10 +110,10 @@ const messages = [
 
 function moveNo(){
   count++;
-  localStorage.setItem("noCount", count);
   countEl.textContent = count;
   msg.textContent = messages[Math.floor(Math.random()*messages.length)];
   if(navigator.vibrate){navigator.vibrate(50);}
+  
   const area = document.querySelector(".buttons");
   const maxX = area.clientWidth - noBtn.offsetWidth;
   const maxY = area.clientHeight - noBtn.offsetHeight;
@@ -111,28 +121,26 @@ function moveNo(){
   const y = Math.random() * maxY;
   noBtn.style.left = x + "px";
   noBtn.style.top = y + "px";
+  
+  startAudio(); // محاولة تشغيل الموسيقى عند محاولة الهروب
 }
 
 noBtn.addEventListener("mouseover", moveNo);
 noBtn.addEventListener("touchstart", moveNo);
 
-startMusicBtn.addEventListener("click",()=>{
-  bgMusic.play().catch(()=>alert("Tap somewhere to enable sound"));
-  startMusicBtn.style.display="none";
-});
-
 yesBtn.addEventListener("click", () => {
-  pop.currentTime=0; pop.play();
-  bgMusic.play().catch(()=>{startMusicBtn.style.display="inline-block";});
+  pop.currentTime = 0; 
+  pop.play();
+  startAudio(); 
   explodeHearts();
-  setTimeout(()=>{
-    main.style.display="none";
-    end.style.display="block";
-  },800);
+  setTimeout(() => {
+    main.style.display = "none";
+    end.style.display = "block";
+  }, 800);
 });
 
 function explodeHearts(){
-  for(let i=0;i<25;i++){
+  for(let i=0; i<25; i++){
     const heart = document.createElement("div");
     heart.className="explosion";
     heart.textContent="❤️";
@@ -141,19 +149,19 @@ function explodeHearts(){
     heart.style.setProperty("--x",(Math.random()*200-100)+"px");
     heart.style.setProperty("--y",(Math.random()*200-100)+"px");
     document.body.appendChild(heart);
-    setTimeout(()=>heart.remove(),1000);
+    setTimeout(()=>heart.remove(), 1000);
   }
 }
 
-setInterval(()=>{
+setInterval(() => {
   const h = document.createElement("div");
   h.className="heart";
   h.textContent="💖";
   h.style.left=Math.random()*100+"vw";
   h.style.fontSize=Math.random()*20+15+"px";
   document.body.appendChild(h);
-  setTimeout(()=>h.remove(),8000);
-},400);
+  setTimeout(()=>h.remove(), 8000);
+}, 400);
 </script>
 
 </body>
