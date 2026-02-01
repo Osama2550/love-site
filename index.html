@@ -74,7 +74,10 @@ let count = parseInt(localStorage.getItem("noCount") || "0");
 countEl.textContent = count;
 
 // اسأل المستخدم عن اسمه عند البداية
-let person = prompt("Enter the person's name 💖") || "Sweetheart";
+// قراءة الاسم من الرابط (query parameter)
+const urlParams = new URLSearchParams(window.location.search);
+let person = urlParams.get("name") || "Sweetheart"; // إذا لم يوجد اسم في الرابط، يظهر "Sweetheart"
+
 question.textContent = `Do you love me, ${person}? ❤️`;
 endMsg.textContent = `Will you be mine, ${person}? 💍❤️`;
 shareLink.href = `https://wa.me/?text=I%20said%20YES%20❤️%20Will%20you%20be%20mine%2C%20${encodeURIComponent(person)}%3F%20Check%20it%20out:%20${encodeURIComponent(location.href)}`;
