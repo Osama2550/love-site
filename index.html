@@ -70,17 +70,24 @@ let end = document.getElementById("end");
 let bgMusic = document.getElementById("bgMusic");
 let startMusicBtn = document.getElementById("startMusic");
 
-let count = parseInt(localStorage.getItem("noCount") || "0");
-countEl.textContent = count;
-
-// اسأل المستخدم عن اسمه عند البداية
-// قراءة الاسم من الرابط (query parameter)
+// --- التعديل الذكي هنا ---
 const urlParams = new URLSearchParams(window.location.search);
-let person = urlParams.get("name") || "Sweetheart"; // إذا لم يوجد اسم في الرابط، يظهر "Sweetheart"
+let person = urlParams.get("name");
+
+// إذا لم يجد الاسم في الرابط، وفقط في هذه الحالة، يظهر المربع
+if (!person || person.trim() === "") {
+    person = prompt("Enter the person's name 💖");
+    if (!person || person.trim() === "") {
+        person = "Sweetheart"; 
+    }
+}
 
 question.textContent = `Do you love me, ${person}? ❤️`;
 endMsg.textContent = `Will you be mine, ${person}? 💍❤️`;
-shareLink.href = `https://wa.me/?text=I%20said%20YES%20❤️%20Will%20you%20be%20mine%2C%20${encodeURIComponent(person)}%3F%20Check%20it%20out:%20${encodeURIComponent(location.href)}`;
+shareLink.href = `https://wa.me/?text=I%20said%20YES%20❤️%20Will%20you%20be%20mine%2C%20${encodeURIComponent(person)}%3F%20Check%20it%20out:%20${encodeURIComponent(window.location.href)}`;
+
+let count = parseInt(localStorage.getItem("noCount") || "0");
+countEl.textContent = count;
 
 const messages = [
   "Why don't you love me? 😢",
@@ -96,10 +103,7 @@ function moveNo(){
   localStorage.setItem("noCount", count);
   countEl.textContent = count;
   msg.textContent = messages[Math.floor(Math.random()*messages.length)];
-
-  // اهتزاز خفيف في الهواتف
   if(navigator.vibrate){navigator.vibrate(50);}
-
   const area = document.querySelector(".buttons");
   const maxX = area.clientWidth - noBtn.offsetWidth;
   const maxY = area.clientHeight - noBtn.offsetHeight;
@@ -112,7 +116,6 @@ function moveNo(){
 noBtn.addEventListener("mouseover", moveNo);
 noBtn.addEventListener("touchstart", moveNo);
 
-// تشغيل موسيقى الخلفية بعد تفاعل المستخدم أو من زر
 startMusicBtn.addEventListener("click",()=>{
   bgMusic.play().catch(()=>alert("Tap somewhere to enable sound"));
   startMusicBtn.style.display="none";
@@ -120,10 +123,7 @@ startMusicBtn.addEventListener("click",()=>{
 
 yesBtn.addEventListener("click", () => {
   pop.currentTime=0; pop.play();
-
-  // تشغيل الموسيقى إذا لم تكن شغالة
   bgMusic.play().catch(()=>{startMusicBtn.style.display="inline-block";});
-
   explodeHearts();
   setTimeout(()=>{
     main.style.display="none";
@@ -145,7 +145,6 @@ function explodeHearts(){
   }
 }
 
-// خلفية قلوب متحركة
 setInterval(()=>{
   const h = document.createElement("div");
   h.className="heart";
